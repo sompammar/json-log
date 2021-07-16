@@ -4,14 +4,19 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.helpers.MessageFormatter;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class JsonUtil {
 
-    String secureKeys = "password, key, jsessionid";
-    public JsonUtil(String secureKeys) {
+    Set<String> secureKeys = new HashSet<>();
+    SecureJsonModule secureJsonModule = null;
+    Set<String> patterns = new HashSet<>();
+
+    public JsonUtil(Set<String> secureKeys) {
         this.secureKeys = secureKeys;
+
+//        this.secureKeys = secureKeys.addAll(Arrays.asList(csvKeys.split(",")));
+        secureJsonModule = new SecureJsonModule(secureKeys);
     }
 
     public JsonUtil(){}
@@ -35,7 +40,7 @@ public class JsonUtil {
     }
 
     public String toJson(Object obj) {
-        ObjectMapper objectMapper = SecureJsonModule.createMapper();
+        ObjectMapper objectMapper = secureJsonModule.createMapper();
 
         try {
 

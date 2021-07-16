@@ -1,8 +1,11 @@
 package org.snp.logutil;
 
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
+
 import ch.qos.logback.classic.pattern.ThrowableHandlingConverter;
 import ch.qos.logback.classic.pattern.ThrowableProxyConverter;
 import ch.qos.logback.classic.spi.ILoggingEvent;
@@ -16,7 +19,11 @@ public class JsonLogFormatter extends LayoutBase<ILoggingEvent> {
     JsonUtil jsonUtil = new JsonUtil();
 
     public void setSecureKeys(String secureKeys) {
-        this.jsonUtil = new JsonUtil(secureKeys);
+        Set<String> secureKeySet = new HashSet<>();
+        if (secureKeys != null) {
+        }
+        //convert secureKeys string to set
+        this.jsonUtil = new JsonUtil(secureKeySet);
     }
 
     public JsonLogFormatter() {

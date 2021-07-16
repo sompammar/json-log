@@ -4,11 +4,15 @@ import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static com.fasterxml.jackson.databind.SerializationFeature.FAIL_ON_EMPTY_BEANS;
 
 public class SecureJsonModule extends Module {
     private static final String moduleName = "logutil";
+    private Set<String> secureKeys = new HashSet<>();
 
     @Override
     public String getModuleName() {
@@ -22,17 +26,21 @@ public class SecureJsonModule extends Module {
 
     @Override
     public void setupModule(SetupContext setupContext) {
-        setupContext.addBeanSerializerModifier(new EncryptedSerializerModifier());
+        setupContext.addBeanSerializerModifier(new EncryptedSerializerModifier(secureKeys));
         setupContext.addBeanDeserializerModifier(new EncryptedDeserializerModifier());
     }
 
-    public static ObjectMapper createMapper() {
+    public SecureJsonModule(Set<String> secureKeys) {
+        this.secureKeys = secureKeys;
+    }
+
+    public ObjectMapper createMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
 
         //NONNULL
         objectMapper.configure(FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.configure(FAIL_ON_EMPTY_BEANS, false);
-        objectMapper.registerModule(new SecureJsonModule());
+        objectMapper.registerModule(new SecureJsonModule(secureKeys));
         return objectMapper;
     }
 }

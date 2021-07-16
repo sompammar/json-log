@@ -14,9 +14,8 @@ import java.util.Set;
 public class EncryptedSerializerModifier extends BeanSerializerModifier {
     Set<String> patterns = new HashSet<>();
     Set<String> keys = new HashSet<>();
-    public EncryptedSerializerModifier() {
-        keys.add("password");
-        keys.add("name");
+    public EncryptedSerializerModifier(Set<String> secureKeys) {
+        this.keys = secureKeys;
         patterns.add("jsessionid");
     }
 
@@ -25,16 +24,13 @@ public class EncryptedSerializerModifier extends BeanSerializerModifier {
 
         List<BeanPropertyWriter> newWriter = new ArrayList<>();
         for(BeanPropertyWriter writer : beanProperties){
-            if(keys.contains(writer.getName()) || containsPattern(writer.getName())) {
+            if(keys.contains(writer.getName())) {
                 JsonSerializer<Object> serializer = new SecureJsonSerializer(writer.getSerializer());
                 writer.assignSerializer(serializer);
             }
             newWriter.add(writer);
-
         }
-
         return newWriter;
-
     }
 
     private boolean containsPattern(String text) {
